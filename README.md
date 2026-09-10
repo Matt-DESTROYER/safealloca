@@ -5,12 +5,12 @@ This is not by any means a guarantee that this is safe completely.
 > This is somewhat cross-platform, but every compiler/architecture combination will likely require new preprocessor branches to be supported. Feel free to leave an issue if you have an unsupported combination!
 
 ## Warning
-Obviously `alloca` should be avoided in general, this is purely an experiment to make it safer. `alloca` can easily be misused, ie using it within a loop: within which each iteration will allocate to the stack, but _will not be deallocated at the end of the loop scope_, resulting in the memory accumulating and potential stack overflows (`SAFEALLOCA` itself should not trigger a stack overflow, however if you call it enough and then you have some additional variables defined later, it is still possible).
+Obviously `alloca` should be avoided in general, this is purely an experiment to make it safer. `alloca` can easily be misused, ie using it within a loop: each iteration will allocate to the stack, but _will not be deallocated at the end of the loop scope_, resulting in the memory accumulating and potential stack overflows (`SAFE_ALLOCA` itself should not trigger a stack overflow, however if you call it enough and then you have some additional variables defined later, it is still possible).
 
 ## Usage
 This is a very easy to use, drop-in library, just copy the `safealloca.h` header file and use as you wish.
 
-In order for `SAFEALLOCA` to work, it has an initialisation function that must be run at the start of the program, and a `#define` flag triggers the actual implementation rather than just including the definitions.
+In order for `SAFE_ALLOCA` to work, it has an initialisation function that must be run at the start of the program, and a `#define` flag triggers the actual implementation rather than just including the definitions.
 
 ```c
 #include <stdio.h>
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
 ```
 
 You can also specify a safety margin, by default this is 4kb (4096 bytes).
-If the remaining available stack memory is smaller than this, `SAFEALLOCA` will simply fail and return NULL.
+If the remaining available stack memory is smaller than this, `SAFE_ALLOCA` will simply fail and return NULL.
 This can be specified by defining `SAFE_ALLOCA_SAFETY_MARGIN` (the margin you want in **bytes**).
 ```c
 // this is the default margin
@@ -56,4 +56,4 @@ According to my very quick and potentially very wrong benchmark:
 > Benchmark tested on Linux (Gentoo)
 
 > Note on the benchmark, order matters!
-> I choose to run the `SAFEALLOCA` bench first as this allows it to run cold. Switching `SAFEALLOCA` and `alloca` in the benchmark brings the difference down to a few hundredths of a second (on my device) and implies `SAFEALLOCA`s performance increases slightly when hot.
+> I choose to run the `SAFE_ALLOCA` bench first as this allows it to run cold. Switching `SAFE_ALLOCA` and `alloca` in the benchmark brings the difference down to a few hundredths of a second (on my device) and implies `SAFE_ALLOCA`s performance increases slightly when hot.
