@@ -39,6 +39,28 @@ __attribute__((noinline)) void run_malloc(size_t size) {
 	free(buffer);
 }
 
+__attribute__((noinline)) void test_safe_alloca_exhaustion() {
+	printf("Starting SAFE_ALLOCA exhaustion test...\n");
+
+	size_t chunk_size = 64 * 1024;
+	size_t count = 0;
+
+	while (1) {
+		char* buffer = (char*)SAFE_ALLOCA(chunk_size);
+
+		if (buffer == NULL) {
+			printf("SUCCESS: `SAFE_ALLOCA` returned NULL and prevented a stack overflow!\n");
+			printf("Stopped safely after allocating %zu chunks (%zu bytes).\n", count, count * chunk_size);
+			break;
+		}
+
+		buffer[0] = 'X';
+		escape(buffer);
+
+		count++;
+	}
+}
+
 double get_time_diff(struct timespec start, struct timespec end) {
 	return (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 }
@@ -94,6 +116,8 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 
 int main() {
 	INIT_SAFE_ALLOCA();
+
+	test_safe_alloca_exhaustion();
 
 	run_benchmark(100000000, 256);
 
