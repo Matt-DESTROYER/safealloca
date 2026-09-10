@@ -65,6 +65,7 @@ CMake is used to build this (although any supported compiler will work with just
 cd safealloca/
 cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
+cd build
 ctest -C Release --output-on-failure
 ```
 
