@@ -14,7 +14,7 @@ extern void* stack_base;
 extern size_t stack_limit;
 
 size_t get_stack_limit(void);
-size_t get_stack_available(void);
+static size_t get_stack_available(void);
 
 #ifdef SAFE_ALLOCA_IMPLEMENTATION
 
@@ -33,9 +33,8 @@ size_t get_stack_limit(void) {
 	return rlim.rlim_cur;
 }
 
-size_t get_stack_available(void) {
-	int temp = 0;
-	void* stack_pointer = (void*)&temp;
+static size_t get_stack_available(void) {
+	void* stack_pointer = __builtin_frame_address(0);
 
 	// note: stack grows downwards
 	size_t stack_used = (size_t)stack_base - (size_t)stack_pointer;
@@ -49,11 +48,8 @@ size_t get_stack_available(void) {
 #endif
 
 #define INIT_SAFE_ALLOCA() \
-do { \
-	int temp = 0; \
-	stack_base = &temp; \
-	stack_limit = get_stack_limit(); \
-} while(0);
+	stack_base = __builtin_frame_address(0); \
+	stack_limit = get_stack_limit();
 
 #define SAFE_ALLOCA(size) ((size + SAFE_ALLOCA_SAFETY_MARGIN) < get_stack_available() ? alloca(size) : NULL)
 
