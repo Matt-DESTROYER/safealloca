@@ -57,3 +57,15 @@ According to my very quick and potentially very wrong benchmark:
 
 > Note on the benchmark, order matters!
 > I choose to run the `SAFE_ALLOCA` bench first as this allows it to run cold. Switching `SAFE_ALLOCA` and `alloca` in the benchmark brings the difference down to a few hundredths of a second (on my device) and implies `SAFE_ALLOCA`s performance increases slightly when hot.
+
+## Building the tests yourself
+CMake is used to build this (although any supported compiler will work with just `CC test.c -o test`)
+
+```sh
+cd safealloca/
+cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+ctest -C Release --output-on-failure
+```
+
+These tests are also run on each commit so you can see the performance on a variety of machines and that the safe failure is working.

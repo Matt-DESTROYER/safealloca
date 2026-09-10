@@ -1,0 +1,58 @@
+name: Test Commit
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            c_compiler: gcc
+          - os: ubuntu-latest
+            c_compiler: clang
+          - os: macos-latest
+            c_compiler: clang
+          - os: macos-latest
+            c_compiler: gcc
+          - os: windows-latest
+            c_compiler: cl
+          - os: windows-latest
+            c_compiler: gcc
+          - os: windows-latest
+            c_compiler: clang
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure CMake
+      shell: bash
+      env:
+        CC: ${{ matrix.c_compiler }}
+      run: |
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          if [ "${{ matrix.c_compiler }}" == "cl" ]; then
+            cmake -S "${{ github.workspace }}/src" -B "${{ github.workspace }}/build" -DCMAKE_BUILD_TYPE=Release
+          else
+            cmake -S "${{ github.workspace }}/src" -B "${{ github.workspace }}/build" -DCMAKE_BUILD_TYPE=Release -G Ninja
+          fi
+        else
+          cmake -S "${{ github.workspace }}/src" -B "${{ github.workspace }}/build" -DCMAKE_BUILD_TYPE=Release
+        fi
+
+    - name: Build
+      shell: bash
+      run: cmake --build "${{ github.workspace }}/build" --config Release
+
+    - name: Run Tests
+      shell: bash
+      working-directory: ${{ github.workspace }}/build
+      run: ctest -C Release --output-on-failure

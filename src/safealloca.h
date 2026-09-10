@@ -1,6 +1,15 @@
 #ifndef SAFE_ALLOCA_H
 #define SAFE_ALLOCA_H
 
+// only MSVC needs to be told not to inline certain things
+#ifdef _MSC_VER
+	#define SAFE_ALLOCA_NOINLINE __declspec(noinline)
+#elif defined(__GNUC__) || defined(__clang__)
+	#define SAFE_ALLOCA_NOINLINE __attribute__((noinline))
+#else
+	#define SAFE_ALLOCA_NOINLINE
+#endif
+
 #ifdef _WIN32
 	#include <windows.h>
 	#include <processthreadsapi.h>
@@ -18,7 +27,7 @@
 	#include <intrin.h>
 	#define RAW_ALLOCA _alloca
 	// close enough that it probably won't matter (with the default safety margin)
-	#define GET_CURRENT_STACK_POINTER() (size_t)_AddressOfReturnAddress()
+	#define GET_CURRENT_STACK_POINTER() (void*)_AddressOfReturnAddress()
 #else
 	#if defined(__has_include)
 		#if __has_include(<alloca.h>)
@@ -45,7 +54,7 @@ extern void* stack_base;
 extern size_t stack_limit;
 
 size_t get_stack_limit(void);
-size_t get_stack_available(void);
+SAFE_ALLOCA_NOINLINE size_t get_stack_available(void);
 
 #ifdef SAFE_ALLOCA_IMPLEMENTATION
 
@@ -56,7 +65,7 @@ size_t get_stack_limit(void) {
 #ifdef _WIN32
 	ULONG_PTR low_limit, high_limit;
 	GetCurrentThreadStackLimits(&low_limit, &high_limit);
-	return (size_t)(high_limit - low_limit);
+	return (size_t)stack_base - (size_t)low_limit;
 #else
 	struct rlimit rlim;
 
@@ -70,7 +79,7 @@ size_t get_stack_limit(void) {
 #endif
 }
 
-size_t get_stack_available(void) {
+SAFE_ALLOCA_NOINLINE size_t get_stack_available(void) {
 	void* stack_pointer = GET_CURRENT_STACK_POINTER();
 
 	// note: stack grows downwards
