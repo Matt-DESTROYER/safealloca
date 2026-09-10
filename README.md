@@ -2,6 +2,8 @@
 A quick attempt to make [`alloca`](https://man7.org/linux/man-pages/man3/alloca.3.html?ref=hackernoon.com) safe.
 This is not by any means a guarantee that this is safe completely.
 
+> This is somewhat cross-platform, but every compiler/architecture combination will likely require new preprocessor branches to be supported. Feel free to leave an issue if you have an unsupported combination!
+
 ## Warning
 Obviously `alloca` should be avoided in general, this is purely an experiment to make it safer. `alloca` can easily be misused, ie using it within a loop: within which each iteration will allocate to the stack, but _will not be deallocated at the end of the loop scope_, resulting in the memory accumulating and potential stack overflows (`SAFEALLOCA` itself should not trigger a stack overflow, however if you call it enough and then you have some additional variables defined later, it is still possible).
 
@@ -55,4 +57,3 @@ According to my very quick and potentially very wrong benchmark:
 
 > Note on the benchmark, order matters!
 > I choose to run the `SAFEALLOCA` bench first as this allows it to run cold. Switching `SAFEALLOCA` and `alloca` in the benchmark brings the difference down to a few hundredths of a second (on my device) and implies `SAFEALLOCA`s performance increases slightly when hot.
-
