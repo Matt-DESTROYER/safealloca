@@ -85,7 +85,7 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 	printf("malloc/free time: %f seconds\n", malloc_time);
 }
 
-int main(int argc, char* argv[]) {
+int main() {
 	INIT_SAFE_ALLOCA();
 
 	run_benchmark(10000000, 256);
