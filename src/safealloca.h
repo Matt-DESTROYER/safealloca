@@ -18,7 +18,7 @@ do { \
 	stack_base = &temp; \
 } while(0);
 
-#define SAFE_ALLOCA(size) ((size) < get_stack_available() ? alloca(size) : NULL)
+#define SAFE_ALLOCA(size) ((size + SAFE_ALLOCA_SAFETY_MARGIN) < get_stack_available() ? alloca(size) : NULL)
 
 #ifdef SAFE_ALLOCA_IMPLEMENTATION
 
@@ -47,3 +47,4 @@ size_t get_stack_available(void) {
 
 #endif
 #endif
+
