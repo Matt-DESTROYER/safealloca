@@ -46,19 +46,14 @@ double get_time_diff(struct timespec start, struct timespec end) {
 void run_benchmark(size_t iterations, size_t allocation_size) {
 	struct timespec start, end;
 
-	printf("Benchmarking %zu iterations of allocating %zu bytes...\n", iterations, allocation_size);
-
-	// alloca
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
-	for (size_t i = 0; i < iterations; i++) {
-		run_unsafe_alloca(allocation_size);
+	// Warmup
+	printf("Warming up the CPU...\n");
+	volatile int dummy = 0;
+	for (size_t i = 0; i < 100000000; i++) {
+		dummy += i;
 	}
 
-	clock_gettime(CLOCK_MONOTONIC, &end);
-	double unsafe_alloca_time = get_time_diff(start, end);
-
-	printf("alloca time: %f seconds\n", unsafe_alloca_time);
+	printf("Benchmarking %zu iterations of allocating %zu bytes...\n", iterations, allocation_size);
 
 	// SAFE_ALLOCA
 	clock_gettime(CLOCK_MONOTONIC, &start);
@@ -71,6 +66,19 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 	double safe_alloca_time = get_time_diff(start, end);
 
 	printf("SAFEALLOCA time: %f seconds\n", safe_alloca_time);
+
+
+	// alloca
+	clock_gettime(CLOCK_MONOTONIC, &start);
+
+	for (size_t i = 0; i < iterations; i++) {
+		run_unsafe_alloca(allocation_size);
+	}
+
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	double unsafe_alloca_time = get_time_diff(start, end);
+
+	printf("alloca time: %f seconds\n", unsafe_alloca_time);
 
 	// malloc
 	clock_gettime(CLOCK_MONOTONIC, &start);
@@ -88,7 +96,7 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 int main() {
 	INIT_SAFE_ALLOCA();
 
-	run_benchmark(10000000, 256);
+	run_benchmark(100000000, 256);
 
 	return EXIT_SUCCESS;
 }
