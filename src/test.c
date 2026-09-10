@@ -26,10 +26,6 @@ static double get_time_diff(benchmark_time_t start, benchmark_time_t end) {
 #include <time.h>
 typedef struct timespec benchmark_time_t;
 
-double get_time_diff(struct timespec start, struct timespec end) {
-	return (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-}
-
 static void get_current_time(benchmark_time_t* t) {
 	clock_gettime(CLOCK_MONOTONIC, t);
 }
