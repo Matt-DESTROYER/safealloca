@@ -67,7 +67,6 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 
 	printf("SAFEALLOCA time: %f seconds\n", safe_alloca_time);
 
-
 	// alloca
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
