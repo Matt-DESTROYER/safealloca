@@ -6,7 +6,9 @@
 #include <stdint.h>
 #include <sys/resource.h>
 
+#ifndef SAFE_ALLOCA_SAFETY_MARGIN
 #define SAFE_ALLOCA_SAFETY_MARGIN 4096
+#endif
 
 extern void* stack_base;
 
