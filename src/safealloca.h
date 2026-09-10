@@ -27,24 +27,24 @@ do { \
 void* stack_base = NULL;
 
 size_t get_stack_available(void) {
-		struct rlimit rlim;
+	struct rlimit rlim;
 
-		if (getrlimit(RLIMIT_STACK, &rlim) != 0)
-				return 0;
+	if (getrlimit(RLIMIT_STACK, &rlim) != 0)
+		return 0;
 
-		if (rlim.rlim_cur == RLIM_INFINITY)
-				return SIZE_MAX;
+	if (rlim.rlim_cur == RLIM_INFINITY)
+		return SIZE_MAX;
 
-		int temp = 0;
-		void* stack_pointer = (void*)&temp;
+	int temp = 0;
+	void* stack_pointer = (void*)&temp;
 
-		// note: stack grows downwards
-		size_t stack_used = (size_t)stack_base - (size_t)stack_pointer;
+	// note: stack grows downwards
+	size_t stack_used = (size_t)stack_base - (size_t)stack_pointer;
 
-		if (stack_used >= rlim.rlim_cur)
-				return 0;
+	if (stack_used >= rlim.rlim_cur)
+		return 0;
 
-		return rlim.rlim_cur - stack_used;
+	return rlim.rlim_cur - stack_used;
 }
 
 #endif
