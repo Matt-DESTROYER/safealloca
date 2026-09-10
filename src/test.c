@@ -50,7 +50,7 @@ static void escape(void* p) {
 #endif
 
 NOINLINE void run_unsafe_alloca(size_t size) {
-	char* buffer = (char*)alloca(size);
+	char* buffer = (char*)RAW_ALLOCA(size);
 	if (buffer == NULL)
 		return;
 
