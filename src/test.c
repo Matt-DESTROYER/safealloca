@@ -10,6 +10,9 @@
 	#define NOINLINE __attribute__((noinline))
 #endif
 
+#define SLOWER "slower"
+#define FASTER "faster"
+
 #ifdef _WIN32
 #include <windows.h>
 typedef LARGE_INTEGER benchmark_time_t;
@@ -88,7 +91,8 @@ NOINLINE void test_safe_alloca_exhaustion() {
 
 		if (buffer == NULL) {
 			printf("SUCCESS: `SAFE_ALLOCA` returned NULL and prevented a stack overflow!\n");
-			printf("Stopped safely after allocating %zu chunks (%zu bytes).\n", count, count * chunk_size);
+			printf("Stopped safely after allocating %zu chunks (%zu bytes).\n",
+				count, count * chunk_size);
 			break;
 		}
 
@@ -109,7 +113,8 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 		dummy += i;
 	}
 
-	printf("Benchmarking %zu iterations of allocating %zu bytes...\n", iterations, allocation_size);
+	printf("Benchmarking %zu iterations of allocating %zu bytes...\n",
+		iterations, allocation_size);
 
 	// SAFE_ALLOCA
 	get_current_time(&start);
@@ -148,10 +153,28 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 	printf("malloc/free time: %f seconds\n", malloc_time);
 
 	if (safe_alloca_time > malloc_time) {
-		printf("\n[WARNING] `SAFE_ALLOCA` was slower than malloc (%f vs %f)\n", safe_alloca_time, malloc_time);
+		printf("\n[WARNING] `SAFE_ALLOCA` was slower than malloc (%f vs %f)\n",
+			safe_alloca_time, malloc_time);
 	} else {
 		printf("\n[SUCCESS] `SAFE_ALLOCA` outperformed malloc.\n");
 	}
+
+	int safe_vs_unsafe = safe_alloca_time < unsafe_alloca_time;
+	double safe_vs_unsafe_ratio = safe_vs_unsafe
+		? (unsafe_alloca_time / safe_alloca_time)
+		: (safe_alloca_time / unsafe_alloca_time);
+
+	int safe_vs_malloc = safe_alloca_time < malloc_time;
+	double safe_vs_malloc_ratio = safe_vs_malloc
+		? (malloc_time / safe_alloca_time)
+		: (safe_alloca_time / malloc_time);
+
+	printf("`SAFE_ALLOCA` performed %.2f%% %s than `RAW_ALLOCA`\n",
+		(safe_vs_unsafe_ratio - 1.0) * 100.0,
+		safe_vs_unsafe ? FASTER : SLOWER);
+	printf("`SAFE_ALLOCA` performed %.2f%% %s than `malloc`\n",
+		(safe_vs_malloc_ratio - 1.0) * 100.0,
+		safe_vs_malloc ? FASTER : SLOWER);
 }
 
 int main() {
