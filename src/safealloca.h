@@ -94,8 +94,8 @@ bool get_stack_limit(safe_alloca_stack_t* stack) {
 	ULONG_PTR high;
 	GetCurrentThreadStackLimits(&low, &high);
 
-	stack.low = (uintptr_t)low;
-	stack.high = (uintptr_t)high;
+	stack->low = (uintptr_t)low;
+	stack->high = (uintptr_t)high;
 #else
 	void* stack_addr;
 	size_t stack_size;
