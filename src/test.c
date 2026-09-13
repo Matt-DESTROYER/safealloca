@@ -1,6 +1,13 @@
+#define _GNU_SOURCE
+
 #include <stdlib.h>
 #include <stdio.h>
 
+// `SAFE_ALLOCA_LAZY_INITIALISATION` removes the need to call `SAFE_ALLOCA_INIT`
+// at a non-negligible cost to performance
+//#define SAFE_ALLOCA_LAZY_INITIALISATION
+// we actually want the implementation, not just the header
+// (the implementation should only be pulled in once)
 #define SAFE_ALLOCA_IMPLEMENTATION
 #include "safealloca.h"
 
@@ -62,7 +69,8 @@ NOINLINE void run_unsafe_alloca(size_t size) {
 }
 
 NOINLINE void run_safe_alloca(size_t size) {
-	char* buffer = (char*)SAFE_ALLOCA(size);
+	char* buffer;
+	SAFE_ALLOCA(&buffer, size);
 	if (buffer == NULL)
 		return;
 
@@ -87,7 +95,8 @@ NOINLINE void test_safe_alloca_exhaustion() {
 	size_t count = 0;
 
 	while (1) {
-		char* buffer = (char*)SAFE_ALLOCA(chunk_size);
+		char* buffer;
+		SAFE_ALLOCA(&buffer, chunk_size);
 
 		if (buffer == NULL) {
 			printf("SUCCESS: `SAFE_ALLOCA` returned NULL and prevented a stack overflow!\n");
@@ -178,7 +187,8 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 }
 
 int main() {
-	INIT_SAFE_ALLOCA();
+	// only neccessary if you define `SAFE_ALLOCA_EXPLICIT_INITIALISATION`
+	SAFE_ALLOCA_INIT();
 
 	test_safe_alloca_exhaustion();
 
@@ -186,4 +196,3 @@ int main() {
 
 	return EXIT_SUCCESS;
 }
-
