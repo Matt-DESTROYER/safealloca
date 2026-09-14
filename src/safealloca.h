@@ -1,14 +1,6 @@
 #ifndef SAFE_ALLOCA_H
 #define SAFE_ALLOCA_H
 
-#ifdef _MSC_VER
-	#define SAFE_ALLOCA_NOINLINE __declspec(noinline)
-#elif defined(__GNUC__) || defined(__clang__)
-	#define SAFE_ALLOCA_NOINLINE __attribute__((noinline))
-#else
-	#define SAFE_ALLOCA_NOINLINE
-#endif
-
 #ifdef _WIN32
 	#include <windows.h>
 	#include <processthreadsapi.h>
@@ -48,8 +40,12 @@
 	#endif
 #endif
 
-/* C11+ */
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+
 #ifdef __STDC_VERSION__
+	/* C11+ */
 	#if __STDC_VERSION__ >= 201112L
 		#define SAFE_ALLOCA_THREAD_LOCAL _Thread_local
 	#else
@@ -63,9 +59,13 @@
 	#error "Thread-local storage is required for thread-safety, this compiler is not yet supported or incompatible. If you don't need thread-safety, feel free to remove this line!"
 #endif
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
+#ifdef _MSC_VER
+	#define SAFE_ALLOCA_NOINLINE __declspec(noinline)
+#elif defined(__GNUC__) || defined(__clang__)
+	#define SAFE_ALLOCA_NOINLINE __attribute__((noinline))
+#else
+	#define SAFE_ALLOCA_NOINLINE
+#endif
 
 #ifndef SAFE_ALLOCA_SAFETY_MARGIN
 	#define SAFE_ALLOCA_SAFETY_MARGIN (1024 * 64) /* 64 KiB */

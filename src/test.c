@@ -137,7 +137,7 @@ void run_benchmark(size_t iterations, size_t allocation_size) {
 
 	printf("SAFEALLOCA time: %f seconds\n", safe_alloca_time);
 
-	// alloca
+	// RAW_ALLOCA
 	get_current_time(&start);
 
 	for (size_t i = 0; i < iterations; i++) {
