@@ -21,6 +21,8 @@ For example, if you call it enough times and then have additional variables or s
 
 This is a very easy-to-use, drop-in library: just copy the `safealloca.h` header file and use as you wish.
 
+> Note: you can now use this as a [Cute](https://github.com/Matt-DESTROYER/cute) package, simply `cute add Matt-DESTROYER/safealloca`.
+
 `SAFE_ALLOCA` requires its stack bounds to be initialised before use.
 By default, this is done explicitly with `SAFE_ALLOCA_INIT()`.
 Initialisation is **per-thread**, so each thread that uses `SAFE_ALLOCA` must initialise itself.
